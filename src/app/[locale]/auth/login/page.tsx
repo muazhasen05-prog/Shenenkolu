@@ -47,9 +47,9 @@ export default function LoginPage() {
           .single();
 
         if (profile && ['super_admin', 'editor', 'moderator'].includes(profile.role)) {
-          router.push('/admin' as any);
+          window.location.href = '/admin';
         } else {
-          router.push('/');
+          window.location.href = '/';
         }
       }
     } catch {
@@ -118,6 +118,25 @@ export default function LoginPage() {
               <Link href="/auth/register" className="text-sm text-muted-foreground hover:text-foreground">
                 {t('noAccount')}
               </Link>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-border/80 text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-semibold text-foreground">Super Admin Credentials:</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('admin@shenenkolu.gov.et');
+                    setPassword('SecureInitialPassword123!');
+                  }}
+                  className="text-primary hover:underline font-bold text-xs"
+                >
+                  Fill Credentials
+                </button>
+              </div>
+              <p className="font-mono text-[11px] text-muted-foreground break-all">
+                admin@shenenkolu.gov.et / SecureInitialPassword123!
+              </p>
             </div>
           </form>
         </CardContent>
