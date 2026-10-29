@@ -4,7 +4,6 @@ import * as React from 'react';
 import { useRouter } from '@/navigation';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/navigation';
-import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
@@ -14,7 +13,6 @@ export default function LoginPage() {
   const t = useTranslations('auth');
   const tCommon = useTranslations('common');
   const router = useRouter();
-  const supabase = createClient();
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -27,30 +25,22 @@ export default function LoginPage() {
     setErrorMessage(null);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (error) {
-        setErrorMessage(error.message);
+      const result = await response.json();
+
+      if (!response.ok || result.error) {
+        setErrorMessage(result.error || tCommon('error'));
         setIsLoading(false);
         return;
       }
 
-      if (data.user) {
-        // Check user role from profile to determine redirection
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
-
-        if (profile && ['super_admin', 'editor', 'moderator'].includes(profile.role)) {
-          window.location.href = '/admin';
-        } else {
-          window.location.href = '/';
-        }
+      if (result.success) {
+        window.location.href = result.redirectUrl || '/admin';
       }
     } catch {
       setErrorMessage(tCommon('error'));

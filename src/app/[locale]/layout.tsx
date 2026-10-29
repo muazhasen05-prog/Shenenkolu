@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type { Metadata, Viewport } from 'next';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
@@ -11,13 +11,6 @@ import { PwaRegister } from '@/components/pwa/PwaRegister';
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
-
-export const viewport: Viewport = {
-  themeColor: '#047857',
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 5,
-};
 
 export async function generateMetadata({
   params,
@@ -72,23 +65,11 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} dir="ltr" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="min-h-screen flex flex-col font-sans bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary">
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <PwaRegister />
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <PwaRegister />
+      <Header />
+      <main className="flex-1">{children}</main>
+      <Footer />
+    </NextIntlClientProvider>
   );
 }
